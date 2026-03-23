@@ -9,7 +9,8 @@ import "leaflet/dist/leaflet.css";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
@@ -66,13 +67,13 @@ export default function EventLocationMap({ location }: EventLocationMapProps) {
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-            location
+            location,
           )}`,
           {
             headers: {
               "User-Agent": "AgoraApp/1.0 (contact@agora-demo.com)",
             },
-          }
+          },
         );
         const data = await response.json();
 
@@ -110,7 +111,9 @@ export default function EventLocationMap({ location }: EventLocationMapProps) {
   if (isLoading) {
     return (
       <div className="w-full h-full bg-black/5 animate-pulse flex items-center justify-center">
-        <span className="text-black/50 font-medium font-heading">Loading map...</span>
+        <span className="text-black/50 font-medium font-heading">
+          Loading map...
+        </span>
       </div>
     );
   }
@@ -118,7 +121,9 @@ export default function EventLocationMap({ location }: EventLocationMapProps) {
   if (error || !coords) {
     return (
       <div className="w-full h-full bg-black/5 flex items-center justify-center">
-        <span className="text-black/50 font-medium font-heading">Location not found</span>
+        <span className="text-black/50 font-medium font-heading">
+          Location not found
+        </span>
       </div>
     );
   }
@@ -129,7 +134,7 @@ export default function EventLocationMap({ location }: EventLocationMapProps) {
         center={coords}
         zoom={13}
         scrollWheelZoom={false}
-        className="w-full h-full !z-0"
+        className="w-full h-full z-0!"
         style={{ zIndex: 0 }}
       >
         <TileLayer

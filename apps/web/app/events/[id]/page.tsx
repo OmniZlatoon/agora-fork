@@ -13,7 +13,9 @@ const Map = dynamic(() => import("@/components/events/event-location-map"), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full bg-black/5 animate-pulse flex items-center justify-center">
-      <span className="text-black/50 font-medium font-heading">Loading map...</span>
+      <span className="text-black/50 font-medium font-heading">
+        Loading map...
+      </span>
     </div>
   ),
 });
@@ -50,7 +52,7 @@ export default function EventDetailPage({
           {/* LEFT COLUMN (Desktop) / TOP ITEMS (Mobile) */}
           <div className="lg:w-[55%] flex flex-col gap-8 lg:gap-10">
             {/* Cover Image Container - Dark Navy Background */}
-            <div className="relative aspect-[16/10] sm:aspect-[16/11] w-full rounded-[32px] sm:rounded-[40px] overflow-hidden bg-[#0B151F] shadow-sm flex items-center justify-center p-6 sm:p-12">
+            <div className="relative aspect-16/10 sm:aspect-16/11 w-full rounded-[32px] sm:rounded-[40px] overflow-hidden bg-[#0B151F] shadow-sm flex items-center justify-center p-6 sm:p-12">
               <div className="relative w-full h-full">
                 <Image
                   src={event.imageUrl}
@@ -100,7 +102,7 @@ export default function EventDetailPage({
               <p className="text-[18px] font-medium text-black -mt-2">
                 {event.location}
               </p>
-              <div className="relative aspect-[16/10] w-full rounded-[24px] overflow-hidden border border-black/10">
+              <div className="relative aspect-16/10 w-full rounded-[24px] overflow-hidden border border-black/10">
                 <Map location={event.location} />
               </div>
             </div>
@@ -217,7 +219,7 @@ export default function EventDetailPage({
               <p className="text-[17px] font-medium text-black -mt-2">
                 {event.location}
               </p>
-              <div className="relative aspect-[16/10] w-full rounded-[24px] overflow-hidden border border-black/10">
+              <div className="relative aspect-16/10 w-full rounded-[24px] overflow-hidden border border-black/10">
                 <Map location={event.location} />
               </div>
             </div>
