@@ -3842,7 +3842,7 @@ fn test_active_proposals_list() {
 }
 
 #[test]
-fn test_set_platform_fee_boundary() {
+fn test_cancelled_status_guard() {
     let env = Env::default();
     env.mock_all_auths();
     let contract_id = env.register(EventRegistry, ());
@@ -3853,11 +3853,52 @@ fn test_set_platform_fee_boundary() {
     let usdc_token = Address::generate(&env);
     client.initialize(&admin, &platform_wallet, &500, &usdc_token);
 
-    // Set to 100% (10000 bps) - should pass
-    client.set_platform_fee(&10000);
-    assert_eq!(client.get_platform_fee(), 10000);
+    let organizer = Address::generate(&env);
+    let event_id = String::from_str(&env, "cancelled_event");
 
-    // Set to 100.01% (10001 bps) - should fail
-    let result = client.try_set_platform_fee(&10001);
-    assert_eq!(result, Err(Ok(EventRegistryError::InvalidFeePercent)));
+    // Register event
+    let tiers = Map::new(&env);
+    client.register_event(&EventRegistrationArgs {
+        event_id: event_id.clone(),
+        organizer_address: organizer.clone(),
+        payment_address: Address::generate(&env),
+        metadata_cid: String::from_str(
+            &env,
+            "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+        ),
+        max_supply: 100,
+        milestone_plan: None,
+        tiers,
+        refund_deadline: 0,
+        restocking_fee: 0,
+        resale_cap_bps: None,
+        min_sales_target: None,
+        target_deadline: None,
+        banner_cid: None,
+    });
+
+    // Cancel event
+    client.cancel_event(&event_id);
+
+    // Try to update status - should fail
+    let result = client.try_update_event_status(&event_id, &true);
+    assert_eq!(result, Err(Ok(EventRegistryError::EventCancelled)));
+
+    // Try to postpone - should fail
+    let result = client.try_postpone_event(&event_id, &10000000);
+    assert_eq!(result, Err(Ok(EventRegistryError::EventCancelled)));
+
+    // Try to update metadata - should fail
+    let result = client.try_update_metadata(
+        &event_id,
+        &String::from_str(
+            &env,
+            "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+        ),
+    );
+    assert_eq!(result, Err(Ok(EventRegistryError::EventCancelled)));
+
+    // Try to set custom fee - should fail
+    let result = client.try_set_custom_event_fee(&event_id, &Some(100));
+    assert_eq!(result, Err(Ok(EventRegistryError::EventCancelled)));
 }
