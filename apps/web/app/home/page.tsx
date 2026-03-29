@@ -275,7 +275,7 @@ function AnimatedToggle<T extends string>({
   );
 }
 
-function SectionHeader({
+function SectionHeader<T extends string>({
   title,
   tabs,
   activeTab,
@@ -283,9 +283,9 @@ function SectionHeader({
   layoutId,
 }: {
   title: string;
-  tabs: { id: string; label: string }[];
-  activeTab: string;
-  onTabChange: (tab: string) => void;
+  tabs: { id: T; label: string }[];
+  activeTab: T;
+  onTabChange: (tab: T) => void;
   layoutId: string;
 }) {
   return (
