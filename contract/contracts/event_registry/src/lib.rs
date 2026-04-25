@@ -91,9 +91,9 @@ use crate::events::{
     EventRegisteredEvent, EventStatusUpdatedEvent, EventsSuspendedEvent, FeeUpdatedEvent,
     FeedbackCidSetEvent, GlobalPromoUpdatedEvent, GoalMetEvent, InitializationEvent,
     InventoryIncrementedEvent, LoyaltyScoreUpdatedEvent, MetadataUpdatedEvent,
-    OrganizerBlacklistedEvent, OrganizerRemovedFromBlacklistEvent, RegistryUpgradedEvent,
-    ScannerAuthorizedEvent, StakerRewardsClaimedEvent, StakerRewardsDistributedEvent,
-    TokenWhitelistUpdatedEvent, ProposalCancelledEvent,
+    OrganizerBlacklistedEvent, OrganizerRemovedFromBlacklistEvent, ProposalCancelledEvent,
+    RegistryUpgradedEvent, ScannerAuthorizedEvent, StakerRewardsClaimedEvent,
+    StakerRewardsDistributedEvent, TokenWhitelistUpdatedEvent,
 };
 use crate::types::{
     BlacklistAuditEntry, EventInfo, EventReceipt, EventRegistrationArgs, EventStatus, GuestProfile,
@@ -412,6 +412,7 @@ impl EventRegistry {
             accepted_tokens: args.accepted_tokens,
             use_global_whitelist: args.use_global_whitelist,
             feedback_cid: None,
+            cancellation_reason: None,
         };
 
         storage::store_event(&env, event_info);
@@ -492,7 +493,11 @@ impl EventRegistry {
     }
 
     /// Cancel an event (only by organizer). This is irreversible.
-    pub fn cancel_event(env: Env, event_id: String) -> Result<(), EventRegistryError> {
+    pub fn cancel_event(
+        env: Env,
+        event_id: String,
+        reason: Option<String>,
+    ) -> Result<(), EventRegistryError> {
         match storage::get_event(&env, event_id.clone()) {
             Some(mut event_info) => {
                 // Verify organizer signature
@@ -505,6 +510,7 @@ impl EventRegistry {
                 // Update status to Cancelled and deactivate
                 event_info.status = EventStatus::Cancelled;
                 event_info.is_active = false;
+                event_info.cancellation_reason = reason.clone();
                 storage::update_event(&env, event_info.clone());
 
                 // Emit cancellation event
@@ -514,6 +520,7 @@ impl EventRegistry {
                         event_id,
                         cancelled_by: event_info.organizer_address,
                         timestamp: env.ledger().timestamp(),
+                        reason,
                     },
                 );
 
