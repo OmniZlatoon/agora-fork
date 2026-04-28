@@ -72,6 +72,8 @@ pub struct Payment {
     pub refunded_amount: i128,
     pub is_soulbound: bool,
     pub last_checked_in_at: u64,
+    pub referral_amount: i128,
+    pub referrer: Option<Address>,
 }
 
 #[contracttype]
